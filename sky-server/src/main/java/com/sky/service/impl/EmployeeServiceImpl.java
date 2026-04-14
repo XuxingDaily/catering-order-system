@@ -78,12 +78,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         // DTO 转换为 PO
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-        // 更新时间、创建时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        // 操作人，从 ThreadLocal 中获取
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
         // 默认状态开启
         employee.setStatus(StatusConstant.ENABLE);
         // 设置默认密码
@@ -125,10 +119,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateStatus(Integer status, Integer id) {
         Employee employee = Employee.builder().id(Long.valueOf(id)).status(status).build();
 
-        // 更新时间、操作人
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
-
         employeeMapper.update(employee);
     }
 
@@ -152,8 +142,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+
         employeeMapper.update(employee);
     }
 
@@ -178,10 +167,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 修改用户密码
         String newPassword = DigestUtils.md5DigestAsHex(employeeEditPasswordDTO.getNewPassword().getBytes());
         employee.setPassword(newPassword);
-
-        // 更新时间、操作人
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }
