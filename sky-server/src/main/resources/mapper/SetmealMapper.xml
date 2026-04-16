@@ -36,4 +36,20 @@
         </where>
     </select>
 
+    <select id="selectListByCategoryId" parameterType="com.sky.entity.Setmeal" resultType="com.sky.entity.Setmeal">
+        SELECT * FROM setmeal
+        <where>
+            <if test="name != null and name != ''">AND name = #{name}</if>
+            <if test="categoryId != null">AND category_id = #{categoryId}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectDishItemBySetmealId" resultType="com.sky.vo.DishItemVO">
+        SELECT sd.name, sd.copies, d.image, d.description
+        FROM setmeal_dish AS sd
+        LEFT JOIN dish AS d ON sd.dish_id = d.id
+        WHERE sd.setmeal_id = #{setmealId}
+    </select>
+
 </mapper>

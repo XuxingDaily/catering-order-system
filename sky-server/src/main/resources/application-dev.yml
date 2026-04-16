@@ -12,3 +12,13 @@ sky:
     access-key-id: 'LTAI5tRFZUFmKEdJAWcRUpBr'
     access-key-secret: 'AQ1BtjIFmri2O0lA2IiegHepCpVxqi'
     bucket-name: 'java-web-tlias-images'
+
+  redis:
+    host: localhost
+    port: 6379
+    password: 20020313
+    database: 10
+
+  wechat:
+    appid: wx1522e72401147671
+    secret: b03e6e4eb4ca4ca9af748cefcd4abfec

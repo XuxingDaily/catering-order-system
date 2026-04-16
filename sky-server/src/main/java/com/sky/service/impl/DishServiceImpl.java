@@ -58,6 +58,28 @@ public class DishServiceImpl implements DishService {
         return dishMapper.selectList(dishPageQueryDTO);
     }
 
+    @Override
+    public List<DishVO> listWithFlavor(Long categoryId) {
+        List<Dish> dishes = this.list(categoryId);
+
+        // 查询每个 dish 对应的 flavors
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish dish : dishes) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+
+            // 查询 flavors
+            List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(dish.getId());
+            if (!dishFlavors.isEmpty()) {
+                dishVO.setFlavors(dishFlavors);
+            }
+
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
+
     /**
      * 修改菜品状态
      * @param status
