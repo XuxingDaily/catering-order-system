@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
         // 为当前用户生成 jwt 令牌
         Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.USER_ID, openId);
+        claims.put(JwtClaimsConstant.USER_ID, user.getId());
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
 
         // 构建 VO 返回

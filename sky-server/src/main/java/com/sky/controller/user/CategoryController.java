@@ -3,6 +3,7 @@ package com.sky.controller.user;
 import com.sky.entity.Category;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RestController("UserCategoryController")
 @RequestMapping("/user/category")
-@ApiOperation("分类相关接口")
+@Api(tags = "分类相关接口")
 public class CategoryController {
 
     @Autowired
