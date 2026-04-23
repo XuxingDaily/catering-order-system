@@ -13,19 +13,17 @@ import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
-import com.sky.vo.OrderPaymentVO;
-import com.sky.vo.OrderStatisticsVO;
-import com.sky.vo.OrderSubmitVO;
-import com.sky.vo.OrderVO;
+import com.sky.vo.*;
 import com.sky.websocket.WebSocketServer;
-import org.aspectj.weaver.ast.Or;
+import io.swagger.models.auth.In;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -462,5 +460,115 @@ public class OrderServiceImpl implements OrderService {
         msg.put("content", "订单号：" + ordersDB.getNumber());
 
         webSocketServer.sendMessageToAllClient(JSON.toJSONString(msg));
+    }
+
+    private List<LocalDate> getDateList(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+        LocalDate tempDate = begin;
+        while (!tempDate.isAfter(end)) {
+            dateList.add(tempDate);
+            tempDate = tempDate.plusDays(1);
+        }
+        return dateList;
+    }
+
+    /**
+     * 营业额统计
+     * @param reportDTO
+     * @return
+     */
+    @Override
+    public TurnoverReportVO turnoverStatistics(ReportDTO reportDTO) {
+        LocalDate beginDate = reportDTO.getBegin();
+        LocalDate endDate = reportDTO.getEnd();
+        List<LocalDate> dateList = getDateList(beginDate, endDate);
+
+        // 查询数据库
+        LocalDateTime begin = beginDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        Integer status = Orders.COMPLETED;
+        List<Map<String, Object>> resultMap = orderMapper.getTurnoverStatistics(begin, end, status);
+        Map<String, BigDecimal> turnoverMap = resultMap.stream().collect(Collectors.toMap(
+                m -> m.get("orderDate").toString(),
+                m -> (BigDecimal) m.get("turnover")
+        ));
+        List<BigDecimal> turnoverList = dateList.stream().map(date -> {
+            BigDecimal amount = turnoverMap.get(date.toString());
+            return amount == null ? BigDecimal.ZERO : amount;
+        }).collect(Collectors.toList());
+
+        return TurnoverReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .turnoverList(StringUtils.join(turnoverList, ","))
+                .build();
+    }
+
+    private List<Long> getOrderStatistics(List<LocalDate> dateList, LocalDateTime begin, LocalDateTime end, Integer status) {
+        List<Map<String, Object>> resultMap = orderMapper.getOrderStatistics(begin, end, status);
+        Map<String, Object> orderMap = resultMap.stream().collect(Collectors.toMap(
+                m -> m.get("orderDate").toString(),
+                m -> (Long) m.get("total")
+        ));
+        return dateList.stream().map(date -> {
+            Long orderCount = (Long) orderMap.get(date.toString());
+            return orderCount == null ? 0 : orderCount;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 订单统计
+     * @param reportDTO
+     * @return
+     */
+    @Override
+    public OrderReportVO orderStatistics(ReportDTO reportDTO) {
+        LocalDate beginDate = reportDTO.getBegin();
+        LocalDate endDate = reportDTO.getEnd();
+        List<LocalDate> dateList = getDateList(beginDate, endDate);
+
+        // 查询数据库 - 有效订单数列表
+        LocalDateTime begin = beginDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        Integer status = Orders.COMPLETED;
+        List<Long> validOrderCountList = getOrderStatistics(dateList, begin, end, status);
+        long validOrderCount = validOrderCountList.stream().reduce(Long::sum).get();
+
+        // 查询数据库 - 订单数列表
+        List<Long> orderCountList = getOrderStatistics(dateList, begin, end, null);
+        long totalOrderCount = orderCountList.stream().reduce(Long::sum).get();
+
+        // 订单完成率
+        Double orderCompletionRate = totalOrderCount != 0 ? 1.0 * validOrderCount / totalOrderCount : 1.0;
+
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ','))
+                .orderCompletionRate(orderCompletionRate)
+                .orderCountList(StringUtils.join(orderCountList, ','))
+                .totalOrderCount((int) totalOrderCount)
+                .validOrderCount((int) validOrderCount)
+                .validOrderCountList(StringUtils.join(validOrderCountList, ','))
+                .build();
+    }
+
+    /**
+     * 查询销量排名top10接口
+     * @param reportDTO
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getSalesTop10(ReportDTO reportDTO) {
+        LocalDateTime beginTime = reportDTO.getBegin().atStartOfDay();
+        LocalDateTime endTime = reportDTO.getEnd().plusDays(1).atStartOfDay();
+
+        // 查询数据库
+        Integer status = Orders.COMPLETED;
+        List<GoodsSalesDTO> goodsSalesDTOS = orderMapper.getSalesStatistics(beginTime, endTime, status);
+        List<String> nameList = goodsSalesDTOS.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numberList = goodsSalesDTOS.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(nameList, ','))
+                .numberList(StringUtils.join(numberList, ','))
+                .build();
     }
 }

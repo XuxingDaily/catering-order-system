@@ -1,8 +1,13 @@
 package com.sky.mapper;
 
 import com.sky.entity.User;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -27,4 +32,13 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM user WHERE id = #{userId}")
     User selectById(Long userId);
+
+    /**
+     * 用户统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @MapKey("createTime")
+    List<Map<String, Object>> getUserStatistics(LocalDateTime begin, LocalDateTime end);
 }

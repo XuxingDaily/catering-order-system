@@ -1,14 +1,18 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrderStatusCountDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -61,4 +65,33 @@ public interface OrderMapper {
      */
     @Select("SELECT * FROM orders WHERE status = #{status} AND order_time < #{endTime}")
     List<Orders> selectByStatusAndEndTime(Integer status, LocalDateTime endTime);
+
+    /**
+     * 根据状态和时间区间确定营业额
+     * @param beginTime
+     * @param endTime
+     * @param status
+     * @return
+     */
+    @MapKey("orderDate")
+    List<Map<String, Object>> getTurnoverStatistics(LocalDateTime beginTime, LocalDateTime endTime, Integer status);
+
+    /**
+     * 根据日期区间和状态统计订单
+     * @param beginTime
+     * @param endTime
+     * @param status
+     * @return
+     */
+    @MapKey("orderDate")
+    List<Map<String, Object>> getOrderStatistics(LocalDateTime beginTime, LocalDateTime endTime, Integer status);
+
+    /**
+     * 根据日期区间和状态统计销量前十名
+     * @param beginTime
+     * @param endTime
+     * @param status
+     * @return
+     */
+    List<GoodsSalesDTO> getSalesStatistics(LocalDateTime beginTime, LocalDateTime endTime, Integer status);
 }
