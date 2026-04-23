@@ -27,5 +27,5 @@ sky:
 #    private-key-file-path:
 #    api-v3-key:
 #    we-chat-pay-cert-file-path:
-#    notify-url:
-#    refund-notify-url:
+#    notify-url: https://b6afa31.r6.cpolar.cn/notify/paySuccess
+#    refund-notify-url: https://b6afa31.r6.cpolar.cn/notify/refundSuccess

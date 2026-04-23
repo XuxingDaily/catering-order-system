@@ -56,7 +56,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectByOpenId(openId);
         if (user == null) {
             // 用户不存在时自动注册，插入到数据库
-            user = User.builder().openid(openId).createTime(LocalDateTime.now()).build();
+            user = User.builder()
+                    .openid(openId)
+                    .createTime(LocalDateTime.now())
+                    .build();
             // 注意：需要回显id
             userMapper.insert(user);
         }
