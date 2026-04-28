@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.dto.ReportDTO;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.service.ReportService;
 import com.sky.service.UserService;
 import com.sky.vo.OrderReportVO;
 import com.sky.vo.SalesTop10ReportVO;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RestController
 @RequestMapping("/admin/report")
@@ -23,10 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
 
     @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private UserService userService;
+    private ReportService reportService;
 
     /**
      * 营业额统计
@@ -37,7 +37,7 @@ public class ReportController {
     @ApiOperation("营业额统计")
     public Result<TurnoverReportVO> turnoverStatistics(ReportDTO reportDTO) {
         log.info("营业额统计，限定日期：{}", reportDTO);
-        TurnoverReportVO turnoverReportVO = orderService.turnoverStatistics(reportDTO);
+        TurnoverReportVO turnoverReportVO = reportService.turnoverStatistics(reportDTO);
         return Result.success(turnoverReportVO);
     }
 
@@ -50,7 +50,7 @@ public class ReportController {
     @ApiOperation("用户统计")
     public Result<UserReportVO> userStatistics(ReportDTO reportDTO) {
         log.info("用户统计，限定日期：{}", reportDTO);
-        UserReportVO userReportVO = userService.userStatistics(reportDTO);
+        UserReportVO userReportVO = reportService.userStatistics(reportDTO);
         return Result.success(userReportVO);
     }
 
@@ -63,7 +63,7 @@ public class ReportController {
     @ApiOperation("订单统计")
     public Result<OrderReportVO> ordersStatistics(ReportDTO reportDTO) {
         log.info("订单统计，限定日期：{}", reportDTO);
-        OrderReportVO orderReportVO = orderService.orderStatistics(reportDTO);
+        OrderReportVO orderReportVO = reportService.orderStatistics(reportDTO);
         return Result.success(orderReportVO);
     }
 
@@ -76,8 +76,20 @@ public class ReportController {
     @ApiOperation("查询销量排名top10接口")
     public Result<SalesTop10ReportVO> top10(ReportDTO reportDTO) {
         log.info("查询销量排名top10接口，限定日期：{}", reportDTO);
-        SalesTop10ReportVO salesTop10ReportVO = orderService.getSalesTop10(reportDTO);
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getSalesTop10(reportDTO);
         return Result.success(salesTop10ReportVO);
+    }
+
+    /**
+     * 导出运营数据报表
+     * @return
+     */
+    @GetMapping("/export")
+    @ApiOperation("导出运营数据报表")
+    public Result export(HttpServletResponse response) {
+        log.info("导出运营数据报表");
+        reportService.exportBusinessData(response);
+        return Result.success();
     }
 
 }

@@ -81,49 +81,4 @@ public class UserServiceImpl implements UserService {
         return UserLoginVO.builder().id(user.getId()).openid(openId).token(token).build();
     }
 
-    /**
-     * 用户统计
-     * @param reportDTO
-     * @return
-     */
-    @Override
-    public UserReportVO userStatistics(ReportDTO reportDTO) {
-        LocalDate beginDate = reportDTO.getBegin();
-        LocalDate endDate = reportDTO.getEnd();
-
-        // 生成完整的日期列表 (用于填充和VO返回)
-        List<LocalDate> dateList = new ArrayList<>();
-        LocalDate tempDate = beginDate;
-        while (!tempDate.isAfter(endDate)) {
-            dateList.add(tempDate);
-            tempDate = tempDate.plusDays(1);
-        }
-
-        // 查询数据库 - 新增用户列表
-        LocalDateTime begin = beginDate.atStartOfDay();
-        LocalDateTime end = begin.plusDays(1);
-        List<Long> newUserList = getUserList(dateList, begin, end);
-
-        // 查询数据库 - 总用户
-        List<Long> totalUserList = getUserList(dateList, null, null);
-
-        return UserReportVO.builder()
-                .dateList(StringUtils.join(dateList, ','))
-                .newUserList(StringUtils.join(newUserList, ','))
-                .totalUserList(StringUtils.join(totalUserList, ','))
-                .build();
-    }
-
-    private List<Long> getUserList(List<LocalDate> dateList, LocalDateTime begin, LocalDateTime end) {
-        List<Map<String, Object>> totalResultMap = userMapper.getUserStatistics(begin, end);
-        Map<String, Long> userMap = totalResultMap.stream().collect(Collectors.toMap(
-                m -> m.get("createTime").toString(),
-                m -> (Long) m.get("total")
-        ));
-        return dateList.stream().map(date -> {
-            Long total = userMap.get(date.toString());
-            return total == null ? 0 : total;
-        }).collect(Collectors.toList());
-    }
-
 }

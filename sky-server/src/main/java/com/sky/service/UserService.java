@@ -14,11 +14,4 @@ public interface UserService {
      */
     UserLoginVO login(UserLoginDTO userLoginDTO);
 
-    /**
-     * 用户统计
-     * @param reportDTO
-     * @return
-     */
-    UserReportVO userStatistics(ReportDTO reportDTO);
-
 }

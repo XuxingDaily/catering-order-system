@@ -47,11 +47,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return
      */
     @Override
-    public BusinessDataVO getBusinessData() {
-        LocalDate now = LocalDate.now();
-        LocalDateTime beginTime = now.atStartOfDay();
-        LocalDateTime endTime = beginTime.plusDays(1);
-
+    public BusinessDataVO getBusinessData(LocalDateTime beginTime, LocalDateTime endTime) {
         // 新增用户数
         Integer newUsers = userMapper.selectUserByTime(beginTime, endTime);
 
@@ -114,11 +110,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return
      */
     @Override
-    public OrderOverViewVO getOrderOverview() {
-        LocalDate now = LocalDate.now();
-        LocalDateTime beginTime = now.atStartOfDay();
-        LocalDateTime endTime = beginTime.plusDays(1);
-
+    public OrderOverViewVO getOrderOverview(LocalDateTime beginTime, LocalDateTime endTime) {
         // 待接单
         int waitingOrders = getOrderCountByTimeAndStatus(beginTime, endTime, Orders.TO_BE_CONFIRMED);
 
