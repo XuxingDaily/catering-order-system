@@ -69,4 +69,11 @@ public interface SetmealMapper {
      */
     List<DishItemVO> selectDishItemBySetmealId(Long id);
 
+    /**
+     * 根据状态统计套餐量
+     * @param status
+     * @return
+     */
+    @Select("SELECT COUNT(1) FROM setmeal WHERE status = #{status}")
+    Integer getSetmealStatisticsByStatus(Integer status);
 }

@@ -41,4 +41,13 @@ public interface UserMapper {
      */
     @MapKey("createTime")
     List<Map<String, Object>> getUserStatistics(LocalDateTime begin, LocalDateTime end);
+
+    /**
+     * 通过时间区间查询用户数
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    @Select("SELECT COUNT(1) FROM user WHERE create_time > #{beginTime} AND create_time < #{endTime}")
+    Integer selectUserByTime(LocalDateTime beginTime, LocalDateTime endTime);
 }

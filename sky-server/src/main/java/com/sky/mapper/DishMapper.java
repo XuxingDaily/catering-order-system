@@ -56,4 +56,11 @@ public interface DishMapper {
      */
     Dish selectById(Long id);
 
+    /**
+     * 根据状态统计菜品数量
+     * @param status
+     * @return
+     */
+    @Select("SELECT COUNT(1) FROM dish WHERE status = #{status}")
+    Integer getDishStatisticsByStatus(Integer status);
 }

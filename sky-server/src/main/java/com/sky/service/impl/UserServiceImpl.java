@@ -125,4 +125,5 @@ public class UserServiceImpl implements UserService {
             return total == null ? 0 : total;
         }).collect(Collectors.toList());
     }
+
 }
