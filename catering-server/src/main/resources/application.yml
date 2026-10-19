@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${catering.datasource.driver-class-name}
+      url: jdbc:mysql://${catering.datasource.host}:${catering.datasource.port}/${catering.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${catering.datasource.username}
+      password: ${catering.datasource.password}
+  redis:
+    host: ${catering.redis.host}
+    port: ${catering.redis.port}
+    password: ${catering.redis.password}
+    database: ${catering.redis.database}
+
+mybatis-plus:
+  #mapper配置文件
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.catering.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      catering:
+        mapper: debug
+        service: info
+        controller: info
+
+catering:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: secretKeyAdmin
+    user-secret-key: secretKeyUser
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    user-ttl: 14400000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    user-token-name: authentication
+
+  alioss:
+    endpoint: ${catering.alioss.endpoint}
+    access-key-id: ${catering.alioss.access-key-id}
+    access-key-secret: ${catering.alioss.access-key-secret}
+    bucket-name: ${catering.alioss.bucket-name}
+
+  payment:
+    provider: mock
+    # Mock 模式下由本服务模拟微信支付平台，异步回调真实的通知入口。
+    mock-notify-url: http://127.0.0.1:${server.port}/notify/paySuccess
+    mock-refund-notify-url: http://127.0.0.1:${server.port}/notify/refundResult
+    mock-callback-delay-millis: 1000
+
+  wechat:
+    appid: ${catering.wechat.appid}
+    secret: ${catering.wechat.secret}
+    # 未接入真实商户号时为 Mock 支付提供固定值；真实模式必须在环境配置中覆盖。
+    mchid: ${WECHAT_MCHID:mock-mchid}
+#    mch-serial-no: ${catering.wechat.mch-serial-no}
+#    private-key-file-path: ${catering.wechat.private-key-file-path}
+#    api-v3-key: ${catering.wechat.api-v3-key}
+#    we-chat-pay-cert-file-path: ${catering.wechat.we-chat-pay-cert-file-path}
+#    notify-url: ${catering.wechat.notify-url}
+#    refund-notify-url: ${catering.wechat.refund-notify-url}

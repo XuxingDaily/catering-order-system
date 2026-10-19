@@ -1,0 +1,3 @@
+-- 兼容说明：退款字段已合并到 core_design_migration.sql。
+-- 请统一执行 core_design_migration.sql；该脚本支持重复运行，并同时补充
+-- 库存、下单幂等、支付、退款、超时关单相关字段和索引。

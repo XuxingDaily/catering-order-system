@@ -1,0 +1,11 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+
+# 保留服务端业务单元测试
+!catering-server/src/test/
+!catering-server/src/test/**
+/catering-server/src/main/resources/application-dev.yml
